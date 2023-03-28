@@ -26,7 +26,7 @@ Assignment As Problem:
 
 
 --- 
-"""
+
 ## Solution: As ( BlackJack Game )
 
     Menus: 
@@ -48,11 +48,15 @@ Assignment As Problem:
         - Found At: [README.md](README.md)
 
 
-"""
+
+---
 
 ## build
 ```
+cd BlackJack
+
 # builds windows .dll as default
+
 dotnet build
 
 dotnet publish -r osx-x64 --self-contained true
@@ -69,13 +73,12 @@ dotnet run --verbosity quiet
 ## test
 
 ```
-dotnet test BlackJackTest/BlackJackTest.csproj
+dotnet test --verbosity m
 ```
 
 ## featured
 
     Currently our BJ game has abitlity to hit or stay , implementing double down and split next release.
-
 
 ### Maintainer:
 Ahmed A. <ahbox@outlook.com>
