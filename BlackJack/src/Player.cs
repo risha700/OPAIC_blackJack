@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace BlackJack;
 
-class Player
+public class Player
 {
 public string name;
 public Stopwatch timer;

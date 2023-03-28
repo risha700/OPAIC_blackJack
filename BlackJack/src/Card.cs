@@ -2,7 +2,7 @@ using System.Globalization;
 
 namespace BlackJack;
 
-class Card 
+public class Card 
 {
 
     public Colors Colors;

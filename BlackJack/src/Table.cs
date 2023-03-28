@@ -1,6 +1,6 @@
 namespace BlackJack;
 
-class Table 
+public class Table 
 {
     public static bool round_paid;
     List<Player> players = new();

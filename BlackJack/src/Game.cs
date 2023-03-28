@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace BlackJack;
 
-class Game
+public class Game
 {
     public static int height = Console.WindowHeight;
     public static int width = Console.WindowWidth;

@@ -1,7 +1,7 @@
 
 
 namespace BlackJack;
-class Hand {
+public class Hand {
     public  List<Card> cards = new();
     public static int strenght;
 

@@ -1,13 +1,13 @@
 namespace BlackJack;
 
-enum Colors
+public enum Colors
 {
     Clubs='♣',
     Diamonds='♦',
     Hearts='♥',
     Spades='♠',
 }
-enum Weight
+public enum Weight
 {
     Ace   = 01,
     Two   = 02,
@@ -23,7 +23,7 @@ enum Weight
     Queen = 12,
     King  = 13,
 }
-enum State
+public enum State
 {
     Intro,
     Lobby,
