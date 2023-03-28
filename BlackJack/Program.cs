@@ -33,6 +33,7 @@ class Play{
             switch (Game.state)
             {
                 case State.Intro:
+                    Game.MainMenu();
                     Player player = Game.PreparePlayer();
                     Table table = new Table(Game.activePlayers);
                     Game.RenderGameInfo();

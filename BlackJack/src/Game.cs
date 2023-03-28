@@ -35,7 +35,7 @@ public class Game
         state = State.Intro;
         Setup();
         IntroAnimation();
-        ShowAchievers();
+        // ShowAchievers();
         // assign dealer
         dealer = GetOrCreatePlayer("dealer", 999999);
         activePlayers.Add(dealer); // add it or not??
@@ -156,7 +156,8 @@ public class Game
         scores.Sort((a, b) => b.balance.CompareTo(a.balance));
     }
     public static void ShowAchievers(){
-        Utils.Render($"Best Records \n\n", x_axis: (width/3)+(width/10), y_axis:(height/3), 
+        // Utils.Render($"Best Records \n\n", x_axis: (width/3)+(width/10), y_axis:(height/3), 
+        Utils.Render($"Best Records \n\n", x_axis: 0, y_axis:0, 
         renderSpace:true, textColor:ConsoleColor.Blue, bgColor:ConsoleColor.DarkYellow);
         Utils.Render($"Player \t Score \n");
         
@@ -386,7 +387,6 @@ public class Game
 
     }
     public static void DealerBrain(){
-        // while(activePlayers[0].hands[0].GetHandStrength()<=17){
         while(activePlayers[0].hands[0].GetHandStrength()<21 && 
         activePlayers[0].hands[0].GetHandStrength() < activePlayers[^1].hands[0].GetHandStrength()){
             DealCard(activePlayers[0], forDealer:true);
@@ -441,6 +441,60 @@ public class Game
         }
 
     }
+    public static void MainMenu(){
+        int xPt = (Table.tableWidth)*100/100;
+        int yPt = (Table.tableHeight)*99/100;
+        Utils.DrawRect(20, 4, (xPt, yPt));
+        Utils.Render("I. How to play\n", x_axis:xPt+2, y_axis:yPt+1);
+        Utils.DrawRect(20, 4, (xPt+30, yPt));
+        Utils.Render("L. Show achievers\n", x_axis:xPt+32, y_axis:yPt+1);
+        Utils.DrawRect(20, 4, (xPt+60, yPt));
+        Utils.Render("P. Play Now\n", x_axis:xPt+62, y_axis:yPt+1);
+
+        switch(Console.ReadKey(true).Key){
+            
+            case ConsoleKey.B: // back
+                clear(0, 0, (width/3)-2, height);
+                Game.state = State.Intro;
+                MainMenu();
+                break;
+            case ConsoleKey.L: // show achievers
+                ShowAchievers();
+                Utils.Write("press B: to go back to lobby", x_axis:0, y_axis:width/2);
+                MainMenu();
+                break;
+            case ConsoleKey.I: // how to play
+                // show info inside switch
+                clear();
+                Console.SetCursorPosition(0,0);
+                Console.WriteLine(Game.AboutBlackJack);
+                Utils.Write("press B: to go back to lobby", x_axis:0, y_axis:width/2);
+                MainMenu();
+                break;
+            default: // play now
+                clear();
+                break; // continue
+
+        }
+    
+     void clear(int x=-1, int y=-1, dynamic? areax=null, dynamic? areay=null){
+         (int h, int v) area = (h:100, v:20);
+         
+        if (areax is not null && areay is not null){
+            area = (h: areax, v: areay);
+        }
+       
+        if(x == -1){x=xPt;}
+        if(y == -1){y=yPt;}
+        for (int i = 0; i <= area.h; i++)
+        {
+            for(int w=0; w<=area.v;w++)
+            Utils.Render(" ", x_axis:x+i, y_axis:y+w, erase:true);
+        }
+    }
+            
+
+    }
     public static void PlayAgain(){
         Game.ProcessScores(); // save 
         if(Game.activePlayers[^1].balance <=0){
@@ -457,23 +511,21 @@ public class Game
             player.hands.Add(new Hand(){ cards = new (){} }); 
         });
         
-        // Game.ProcessScores(read:true);
 
-        Utils.Render($"play again! y|yes n|no :  ", x_axis:(Table.tableWidth)*133/100, y_axis:(Table.tableHeight)*85/100, textColor:ConsoleColor.Yellow, renderSpace:true);
-        string play_again = Utils.Input($"", stringType:true);
-        // activePlayers.ForEach((player)=>player.hands = new());
+        Utils.Render($"play again! y|yes n|no :  ", x_axis:(Table.tableWidth)*133/100, y_axis:(Table.tableHeight)*85/100,
+                    textColor:ConsoleColor.DarkBlue, bgColor:ConsoleColor.Cyan , renderSpace:true);
+        switch(Console.ReadKey(true).Key){
+            case (ConsoleKey.Y):
+                Game.Setup(read_scores:true);
+                new Table(Game.activePlayers);
+                Game.RenderGameInfo();
+                Game.state = State.PlaceBet;
+                break;
+            default:
+                Game.state = State.Lobby;
+                break;
 
-        if(play_again.Contains("y")){
-            // player reset hands
-            Game.Setup(read_scores:true);
-            new Table(Game.activePlayers);
-            Game.RenderGameInfo();
-            Game.state = State.PlaceBet;
-            return;
         }
-        // clean up
-        Game.state = State.Lobby;
-        return;
     
         
     }

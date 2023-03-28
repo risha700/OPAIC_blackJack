@@ -71,6 +71,12 @@ dotnet run --verbosity quiet
 ```
 dotnet test BlackJackTest/BlackJackTest.csproj
 ```
+
+## featured
+
+    Currently our BJ game has abitlity to hit or stay , implementing double down and split next release.
+
+
 ### Maintainer:
 Ahmed A. <ahbox@outlook.com>
 
