@@ -1,0 +1,6 @@
+@startuml
+!include ./Program.puml
+!include ./obj/Debug/net70/.NETCoreApp,Version=v7.0.AssemblyAttributes.puml
+!include ./obj/Debug/net70/BlackJack.GlobalUsings.g.puml
+!include ./obj/Debug/net70/BlackJack.AssemblyInfo.puml
+@enduml

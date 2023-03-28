@@ -1,0 +1,137 @@
+@startuml
+enum Colors {
+    Clubs='♣',
+    Diamonds='♦',
+    Hearts='♥',
+    Spades='♠',
+}
+enum Weight {
+    Ace= 01,
+    Two= 02,
+    Three= 03,
+    Four= 04,
+    Five= 05,
+    Six= 06,
+    Seven= 07,
+    Eight= 08,
+    Nine= 09,
+    Ten= 10,
+    Jack= 11,
+    Queen= 12,
+    King= 13,
+}
+enum State {
+    Intro,
+    Lobby,
+    PlaceBet,
+    ConfirmDealtBlackjack,
+    ChooseMove,
+    ConfirmBust,
+    ConfirmSplit,
+    ConfirmLoss,
+    ConfirmDraw,
+    ConfirmWin,
+    Replay,
+    OutOfMoney,
+}
+class Utils {
+    {static} height : int
+    {static} width : int
+    + {static} Capitalize(word:string) : string
+    + {static} Spacer(_:char, count:int, empty:bool) : void
+    + {static} Stringify(textArr:string[], delimeter:char) : string
+    + {static} Input(message:string, required:bool, stringType:bool) : dynamic
+    + {static} Write(text:string, color:ConsoleColor, bgColor:ConsoleColor, x_axis:int?, y_axis:int?) : void
+    + {static} Render(@string:string, x_axis:int?, y_axis:int?, renderSpace:bool, erase:bool, textColor:ConsoleColor?, bgColor:ConsoleColor?) : void
+    + {static} DrawRect(rectWidth:int, rectHeight:int, point:(int x, int y )) : void
+}
+class Hand {
+    + {static} strenght : int
+    + <<override>> ToString() : string
+    + TranslateCard(card:Card) : int
+    + GetHandStrength() : int
+}
+class Player {
+    + name : string
+    + balance : double
+    + bet : double
+    + Player(playerName:string, initial_bal:double)
+    + <<override>> ToString() : string
+    + GetBet() : int
+}
+class Table {
+    + {static} round_paid : bool
+    + {static} tableWidth : int
+    + {static} tableHeight : int
+    + Table(PlayerList:List<Player>)
+    + Render() : void
+    + SetPlayers() : void
+}
+class Card {
+    + visible : bool = false
+    + Card()
+    + BuildCard() : string[]
+}
+class Game {
+    + {static} height : int
+    + {static} width : int
+    + {static} dealer : Player?
+    + {static} activeHand : int = 0
+    + {static} playerXPosition : int
+    + {static} playerYPosition : int
+    + {static} AboutBlackJack : string = "Blackjack is a casino banking game. \nIt is the most widely played casino \nbanking game in the world. It uses \ndecks of 52 cards and descends from \na global family of casino banking \ngames known as Twenty-One. \nThis family of card games also \nincludes the European games Vingt-et-Un and \nPontoon, and the Russian game Ochko. \n"
+    + {static} BLACKJACK_BANNER : string = ""
+    + Game()
+    +  <<event>> GameOver : EventHandler? 
+    + setGameOver() : void
+    # <<virtual>> OnGameOver(e:EventArgs) : void
+    + {static} onConsoleResize : bool
+    + {static} LoadingIndicator(rounds:int) : void
+    + {static} IntroAnimation() : void
+    + {static} Setup(read_scores:bool) : void
+    + {static} ProcessScores(fileName:string, read:bool) : void
+    + {static} GetOrCreatePlayer(pName:string, startingBalance:double) : Player
+    {static} _sanitize_scores(player:Player) : void
+    + {static} ShowAchievers() : void
+    + {static} Shuffle(cards:List<Card>) : void
+    + {static} PayOut(player:Player, multiply:double) : void
+    + {static} DealRound() : void
+    + {static} DrawMenu(erase:bool) : void
+    + {static} ConfirmBusted() : void
+    + {static} ConfirmMessage(message:string) : void
+    + {static} DisplayPlayerMenu() : void
+    + {static} DealCard(player:Player, hand:int, forDealer:bool) : void
+    + {static} RenderGameInfo(erase:bool, renderDealer:bool) : void
+    + {static} CheckWinner() : void
+    + {static} DealerBrain() : void
+    + {static} GameOverHandler(sender:object, e:EventArgs) : void
+    + {static} PreparePlayer() : Player
+    + {static} RenderPlayerCards(player:Player) : void
+    + {static} RenderDealerCards(visible:bool) : void
+    + {static} PlayAgain() : void
+}
+class Play {
+    + {static} AttachToGameOver(sender:object, e:EventArgs) : void
+    {static} Main(args:string[]) : void
+}
+class "List`1"<T> {
+}
+Hand o-> "cards<Card>" "List`1"
+Player --> "timer" Stopwatch
+Player o-> "random" Random
+Player o-> "hands<Hand>" "List`1"
+Table o-> "players<Player>" "List`1"
+Card --> "Colors" Colors
+Card --> "Weight" Weight
+Game o-> "scores<(string playerName,  double balance)>" "List`1"
+Game o-> "playerTimeOutSpan" TimeSpan
+Game o-> "activePlayers<Player>" "List`1"
+Game o-> "JackCard" Card
+Game o-> "playerRoundStopWatch" Stopwatch
+Game o-> "random" Random
+Game o-> "deck<Card>" "List`1"
+Game --> "state" State
+Game --> "___" _______
+Game --> "_______" _______
+Game --> "_" ___
+@enduml
