@@ -55,6 +55,11 @@ Assignment As Problem:
 ![](./diagram/include.png)
 ## Activity Diagram
  ![](./diagram/activity.png)
+
+## Demo
+![](game_demo.gif)
+![](game_test.gif)
+
 ## build
 ```
 cd BlackJack
