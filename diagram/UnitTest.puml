@@ -1,0 +1,7 @@
+@startuml
+class Tests {
+    + Setup() : void
+    + TestPlayerWin() : void
+    + TestPlayerBust() : void
+}
+@enduml

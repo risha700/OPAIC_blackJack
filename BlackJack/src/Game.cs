@@ -260,7 +260,7 @@ public class Game
         // stay
         // hit
         
-            while (predicate.Contains(Game.state.ToString()))
+        while (predicate.Contains(Game.state.ToString()))
         {
             switch (Console.ReadKey(true).Key)
             {

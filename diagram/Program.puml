@@ -1,0 +1,6 @@
+@startuml
+class Play {
+    + {static} AttachToGameOver(sender:object, e:EventArgs) : void
+    {static} Main(args:string[]) : void
+}
+@enduml

@@ -1,0 +1,11 @@
+@startuml
+class Hand {
+    + {static} strenght : int
+    + <<override>> ToString() : string
+    + TranslateCard(card:Card) : int
+    + GetHandStrength() : int
+}
+class "List`1"<T> {
+}
+Hand o-> "cards<Card>" "List`1"
+@enduml

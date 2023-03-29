@@ -1,0 +1,13 @@
+@startuml
+class Utils {
+    {static} height : int
+    {static} width : int
+    + {static} Capitalize(word:string) : string
+    + {static} Spacer(_:char, count:int, empty:bool) : void
+    + {static} Stringify(textArr:string[], delimeter:char) : string
+    + {static} Input(message:string, required:bool, stringType:bool) : dynamic
+    + {static} Write(text:string, color:ConsoleColor, bgColor:ConsoleColor, x_axis:int?, y_axis:int?) : void
+    + {static} Render(@string:string, x_axis:int?, y_axis:int?, renderSpace:bool, erase:bool, textColor:ConsoleColor?, bgColor:ConsoleColor?) : void
+    + {static} DrawRect(rectWidth:int, rectHeight:int, point:(int x, int y )) : void
+}
+@enduml

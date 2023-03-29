@@ -1,5 +1,5 @@
 # OPAIC_blackJack
-## OPAIC Programing 1 final submission
+## OPAIC BIT Programing 1 Final Submission
 
 ---
 Assignment As Problem: 
@@ -49,8 +49,12 @@ Assignment As Problem:
 
 
 
----
 
+---
+## Class Diagram
+![](./diagram/include.png)
+## Activity Diagram
+ ![](./diagram/activity.png)
 ## build
 ```
 cd BlackJack
@@ -83,6 +87,9 @@ dotnet test --verbosity m
 ### Maintainer:
 Ahmed A. <ahbox@outlook.com>
 
-Instructors: Prof. Tariq Khan | Genesh 
+Mentors: 
+    Prof. Tariq Khan <tariq.khan@op.ac.nz> \
+    Prof. Kathiravelu Ganeshan <kathiravelu.ganeshan@op.ac.nz>
+ 
 
 

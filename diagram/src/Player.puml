@@ -1,0 +1,15 @@
+@startuml
+class Player {
+    + name : string
+    + balance : double
+    + bet : double
+    + Player(playerName:string, initial_bal:double)
+    + <<override>> ToString() : string
+    + GetBet() : int
+}
+class "List`1"<T> {
+}
+Player --> "timer" Stopwatch
+Player o-> "random" Random
+Player o-> "hands<Hand>" "List`1"
+@enduml

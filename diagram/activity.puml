@@ -1,0 +1,126 @@
+@startuml
+
+start
+:Play.Main();
+
+
+
+-[#green,dashed]-> while;
+while (Game.state is not OutOfMoney) 
+    -[#blue,dashed]-> switch;
+    switch (Game.state)
+        case (State.Intro)
+        #yellow:Lobby view;
+          group read key
+                    start
+                    -[#green,dashed]-> while;
+                    while (Console.ReadKey) is (switch)
+                    
+                    switch (Console.Key)
+                        case (Key.A)
+                            :showAchievers();
+                        case (Key.L)
+                            :ShowHowToPlay();
+                        case (Key.P)
+                            :PreparePlayer();
+                            :Game.state = PlaceBet;
+                    endswitch
+                    endwhile
+            end group
+        case ( State.PlaceBet)
+        :Get bet value (input);
+            group read input 
+                :GetBet();
+                :DealRound();
+                #lightGreen:(state=ChooseMove);
+            end group
+        case ( State.ChooseMove )
+        :Game.DisplayPlayerMenu();
+            group read key
+                    start
+                    -[#green,dashed]-> while;
+                    while (Console.ReadKey) is (switch)
+                    
+                    switch (Console.Key)
+                        case (Key.1)
+                            :stay;
+                            group stay 
+                             :RenderDealerCards(true);
+                             #orange:CheckWinner();
+                            end group  
+                        case (Key.2)
+                            :bet;
+                            group bet 
+                                if (<=21?) then (yes)
+                                :Game.DealCard(player);
+                                else (no)
+                                -[#red]->break;
+                                endif
+                            end group    
+                            
+                        case (Key.3)    
+                            :double down
+                            *Not Implemented;
+                        case (Key.4) 
+                            :Split
+                            *Not Implemented;
+                    endswitch
+                    endwhile
+                    
+                
+            end group
+        case ( State.ConfirmBust )
+        :Game.PlayAgain();
+        case ( State.ConfirmLoss )
+        :Game.PlayAgain();
+        case ( State.ConfirmDraw )
+        :Game.PlayAgain();
+        case ( State.ConfirmWin )
+        :Game.PlayAgain();
+        case ( State.ConfirmDealtBlackjack )
+        :Game.PlayAgain();
+        case ( State.Lobby )
+        :Game.Restart();
+    endswitch
+
+
+endwhile
+
+stop
+
+
+
+
+
+
+' if (Page.onSecurityCheck) then (true)
+'   :Page.onInit();
+'   if (isForward?) then (no)
+'     :Process controls;
+'     if (continue processing?) then (no)
+'       stop
+'     endif
+
+'     if (isPost?) then (yes)
+'       :Page.onPost();
+'     else (no)
+'       :Page.onGet();
+'     endif
+'     :Page.onRender();
+'   endif
+' else (false)
+' endif
+
+' if (do redirect?) then (yes)
+'   :redirect process;
+' else
+'   if (do forward?) then (yes)
+'     :Forward request;
+'   else (no)
+'     :Render page template;
+'   endif
+' endif
+
+end
+
+@enduml

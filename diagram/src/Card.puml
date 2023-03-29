@@ -1,0 +1,9 @@
+@startuml
+class Card {
+    + visible : bool = false
+    + Card()
+    + BuildCard() : string[]
+}
+Card --> "Colors" Colors
+Card --> "Weight" Weight
+@enduml

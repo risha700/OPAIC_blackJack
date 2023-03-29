@@ -1,0 +1,54 @@
+@startuml
+class Game {
+    + {static} height : int
+    + {static} width : int
+    + {static} dealer : Player?
+    + {static} activeHand : int = 0
+    + {static} playerXPosition : int
+    + {static} playerYPosition : int
+    + {static} AboutBlackJack : string = "\n Blackjack is a casino banking game. \nIt is the most widely played casino \nbanking game in the world. It uses \ndecks of 52 cards and descends from \na global family of casino banking \ngames known as Twenty-One. \nThis family of card games also \nincludes the European games Vingt-et-Un and \nPontoon, and the Russian game Ochko. \n"
+    + {static} BLACKJACK_BANNER : string = ""
+    + Game()
+    +  <<event>> GameOver : EventHandler? 
+    + setGameOver() : void
+    # <<virtual>> OnGameOver(e:EventArgs) : void
+    + {static} onConsoleResize : bool
+    + {static} LoadingIndicator(rounds:int) : void
+    + {static} IntroAnimation() : void
+    + {static} Setup(read_scores:bool) : void
+    + {static} ProcessScores(fileName:string, read:bool) : void
+    + {static} GetOrCreatePlayer(pName:string, startingBalance:double) : Player
+    {static} _sanitize_scores(player:Player) : void
+    + {static} ShowAchievers() : void
+    + {static} Shuffle(cards:List<Card>) : void
+    + {static} PayOut(player:Player, multiply:double) : void
+    + {static} DealRound() : void
+    + {static} DrawMenu(erase:bool) : void
+    + {static} ConfirmBusted() : void
+    + {static} ConfirmMessage(message:string) : void
+    + {static} DisplayPlayerMenu() : void
+    + {static} DealCard(player:Player, hand:int, forDealer:bool) : void
+    + {static} RenderGameInfo(erase:bool, renderDealer:bool) : void
+    + {static} CheckWinner() : void
+    + {static} DealerBrain() : void
+    + {static} GameOverHandler(sender:object, e:EventArgs) : void
+    + {static} PreparePlayer() : Player
+    + {static} RenderPlayerCards(player:Player) : void
+    + {static} RenderDealerCards(visible:bool) : void
+    + {static} MainMenu() : void
+    + {static} PlayAgain() : void
+}
+class "List`1"<T> {
+}
+Game o-> "scores<(string playerName,  double balance)>" "List`1"
+Game o-> "playerTimeOutSpan" TimeSpan
+Game o-> "activePlayers<Player>" "List`1"
+Game o-> "JackCard" Card
+Game o-> "playerRoundStopWatch" Stopwatch
+Game o-> "random" Random
+Game o-> "deck<Card>" "List`1"
+Game --> "state" State
+Game --> "___" _______
+Game --> "_______" _______
+Game --> "_" ___
+@enduml

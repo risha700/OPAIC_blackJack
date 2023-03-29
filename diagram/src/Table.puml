@@ -1,0 +1,13 @@
+@startuml
+class Table {
+    + {static} round_paid : bool
+    + {static} tableWidth : int
+    + {static} tableHeight : int
+    + Table(PlayerList:List<Player>)
+    + Render() : void
+    + SetPlayers() : void
+}
+class "List`1"<T> {
+}
+Table o-> "players<Player>" "List`1"
+@enduml
