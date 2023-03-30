@@ -67,11 +67,16 @@ class Play{
                     Game.ConfirmMessage("Draw!");
                     Game.PlayAgain();
                     break;
-                case State.ConfirmWin or State.ConfirmDealtBlackjack:
+                case State.ConfirmWin:
                 // case State.ConfirmWin:
                     Game.ConfirmMessage("You Won!");
                     Game.PlayAgain();
-                    break;    
+                    break;   
+               case State.ConfirmDealtBlackjack:
+                // case State.ConfirmWin:
+                    Game.ConfirmMessage("Black Jack!");
+                    Game.PlayAgain();
+                    break; 
                 case State.Lobby:
                     Console.Clear();
                     Game.ProcessScores();

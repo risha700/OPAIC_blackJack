@@ -99,8 +99,26 @@ public class Tests
     }
 
     [Test]
-    public void TestPlayerDoubleDown()
+    public void TestBlackJack3to1()
     {
+        var player = new Player("rs");
+        Game.activePlayers.Add(player);
+        var dealer = Game.activePlayers[0];
+        player.bet = 100;
+        player.balance -=100; // was 500
+        Assert.That(400, Is.EqualTo(player.balance));
+        // // Table table = new Table(Game.activePlayers);
+        player.hands[0].cards.Add(new(){ Colors= Colors.Clubs, Weight= Weight.Jack });
+        player.hands[0].cards.Add(new(){ Colors= Colors.Diamonds, Weight= Weight.Ace });
+        
+        // // 2aces and 6
+        dealer.hands[0].cards.Add(new(){ Colors= Colors.Diamonds, Weight= Weight.Ten });
+        dealer.hands[0].cards.Add(new(){ Colors= Colors.Diamonds, Weight= Weight.Ten });
+        dealer.hands[0].cards.Add(new(){ Colors= Colors.Spades, Weight= Weight.Three });
+        Game.CheckWinner();
+        Assert.That(State.ConfirmDealtBlackjack, Is.EqualTo(Game.state));
+        Assert.That(700, Is.EqualTo(player.balance));
+
     }
 
     [Test]

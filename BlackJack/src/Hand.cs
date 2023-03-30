@@ -9,7 +9,7 @@ public class Hand {
     public override string ToString()
     {
 
-        return "Cards in hand"+cards.Count().ToString();
+        return "Cards in hand "+cards.Count().ToString();
     }
 
     public int TranslateCard(Card card){

@@ -184,10 +184,10 @@ public class Game
         }
     }
     
-    public static void PayOut(Player player, double multiply=2){
+    public static void PayOut(Player player, double rate=2){
 
         if(!Table.round_paid){
-            player.balance += (double) (player.bet)*multiply;
+            player.balance += (double) (player.bet)*rate;
             Table.round_paid = true;
         }
         
@@ -219,22 +219,49 @@ public class Game
         Game.RenderGameInfo();
 
     }
+
+    public static void DoDoubleDown (Player player){
+        DealCard(player);
+        player.balance -= player.bet;
+        player.bet += player.bet;
+        Utils.Render($"your bet: {player.bet}  ", x_axis:(Table.tableWidth)*105/100, y_axis:(Table.tableHeight)*85/100, renderSpace:true); 
+        RenderGameInfo();
+        if(player.hands[activeHand]?.GetHandStrength() > 21) 
+        {
+            ConfirmBusted();
+        } else {
+            TurnToDealer();
+        }
+    }
+
+    public static bool CanDoubleDown(){
+        // either after split
+
+        // or after first deal
+        Player player = activePlayers[^1];
+        bool first_round = (player.hands.Count() == 1 && player.hands[0].cards.Count()==2);
+        bool got_enough = player.balance >= player.bet;
+        return first_round && got_enough;
+    }
     public static void DrawMenu(bool erase=false){
         Player player = activePlayers[^1];
-        // int dealerXPosition = (Table.tableWidth)*140/100;
-        // int dealerYPosition = (Table.tableHeight)*44/100;
         int xPt = (Table.tableWidth)*130/100;
         int yPt = (Table.tableHeight)*85/100;
-        // int xPt = (Game.width/3)+(Game.width/3/3);
-        // int yPt = (Game.height/2);
         Utils.DrawRect(8, 4, (xPt+1, yPt));
         Utils.DrawRect(8, 4, (xPt+15, yPt));
         Utils.Render("1. Stay\n", x_axis:xPt+2, y_axis:yPt+1);
         Utils.Render("2. Hit", x_axis:xPt+16, y_axis:yPt+1);
+        // double down
+        if(CanDoubleDown()){
+            Utils.DrawRect(13, 4, (xPt+30, yPt));
+            Utils.Render("3. Double Down", x_axis:xPt+31, y_axis:yPt+1);
+        }
+ 
+        // Utils.Render("4. Split", x_axis:xPt+16, y_axis:yPt+1);
         if (erase){
             for (int i = 0; i <= 3; i++)
             {
-                Utils.Render("                               ", x_axis:xPt, y_axis:yPt+i, erase:true);
+                Utils.Render("                                                              ", x_axis:xPt, y_axis:yPt+i, erase:true);
             }
         }
         
@@ -252,6 +279,17 @@ public class Game
         DrawMenu(erase:true);
         Utils.Render($"{message.ToString()}", x_axis: playerXPosition+4, y_axis:playerYPosition+6, renderSpace:true, bgColor:ConsoleColor.Yellow);
     }
+    public static void TurnToDealer(){
+        // revert turn to dealer
+        DrawMenu(erase:true);
+        Player dealer = activePlayers[0];
+        RenderDealerCards(true);
+        // int? hand_strenght = dealer.hands[activeHand]?.GetHandStrength();
+        RenderGameInfo(renderDealer:true);
+        // start robot logic
+        DealerBrain();
+        CheckWinner();
+    }
     public static void DisplayPlayerMenu(){
         DrawMenu();
         var s = Enum.GetNames(typeof(State));
@@ -266,16 +304,7 @@ public class Game
             switch (Console.ReadKey(true).Key)
             {
                 case ConsoleKey.D1 or ConsoleKey.NumPad1: // stay
-                    // revert turn to dealer
-                    DrawMenu(erase:true);
-                    Player dealer = activePlayers[0];
-                    RenderDealerCards(true);
-                    // int? hand_strenght = dealer.hands[activeHand]?.GetHandStrength();
-                    RenderGameInfo(renderDealer:true);
-                    // start robot logic
-                    
-                    DealerBrain();
-                    CheckWinner();
+                    TurnToDealer();
                     
                     break;
                 case ConsoleKey.D2 or ConsoleKey.NumPad2: // hit
@@ -287,6 +316,9 @@ public class Game
                     }
                     break;
                 case ConsoleKey.D3 or ConsoleKey.NumPad3 : // double down double the bet for one card only
+                    player = activePlayers[^1];
+                    if(CanDoubleDown())
+                        DoDoubleDown(player);
                     break;
                 case ConsoleKey.D4 or ConsoleKey.NumPad4: // split when cards are the same and pay the same bet
                     break;
@@ -294,9 +326,12 @@ public class Game
                     // CheckWinner();
                     break;
             }
-            
+            DrawMenu(erase:true);
+            DrawMenu();
             // CheckWinner();
-        }               
+        }      
+        
+
         // TODO:
         // doubledown
         // split
@@ -359,10 +394,16 @@ public class Game
         });
         
         bool LessOrEqual21 = (dealerScore <= 21 && playerScore<=21) ;// && (dealerScore>17|| (dealerScore<17&&dealerScore>=playerScore)));
-
+      
+                
         if(dealerScore>21){
-            Game.state = State.ConfirmWin; // dealer bust
-            Game.PayOut(player);
+             if(player.hands[0].cards.Count()==2){
+                    Game.state = State.ConfirmDealtBlackjack; // 21
+                    Game.PayOut(player, 3);
+             }else{
+                    Game.state = State.ConfirmWin; // dealer bust
+                    Game.PayOut(player);
+             }
         }
         if(LessOrEqual21){
 
@@ -380,8 +421,9 @@ public class Game
                     Game.PayOut(player);
                     // double the bet
                 }else{
-                    Game.state = State.ConfirmDealtBlackjack; // 21
-                    Game.PayOut(player);
+                    // if(player.hands[0].cards.Count()==2)
+                    // Game.state = State.ConfirmDealtBlackjack; // 21
+                    // Game.PayOut(player, 3);
                 }
             }         
 
