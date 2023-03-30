@@ -25,7 +25,7 @@ public class Hand {
     }
     public  int GetHandStrength(){
         int total_pts=0;
-        var sortedCard = cards.OrderByDescending(x => (int) (x.Weight)).ToList(); // Ace first
+        var sortedCard = cards.OrderByDescending(x => (int) (x.Weight)).ToList(); // Ace last
         sortedCard.ForEach((card)=>{
             total_pts += TranslateCard(card);
             if(card.Weight.Equals(Weight.Ace)){

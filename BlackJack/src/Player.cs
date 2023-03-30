@@ -22,6 +22,7 @@ public Player(string playerName, double initial_bal=500.00){
     name =  String.IsNullOrEmpty(playerName.Trim().ToString().ToLower()) ?  $"player-{random.Next(1,1000)}": playerName;
     timer = new();
     balance = (double)initial_bal;
+    hands.Clear();
     hands.Add(new Hand(){ cards = new (){} }); 
     bet = 0.00;
     // ranking

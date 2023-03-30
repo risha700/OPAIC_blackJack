@@ -32,6 +32,7 @@ public class Game
             """;
     public Game(){
         // contructor
+        activePlayers.Clear();
         state = State.Intro;
         Setup();
         IntroAnimation();
@@ -249,7 +250,7 @@ public class Game
     }
     public static void ConfirmMessage(string message){            
         DrawMenu(erase:true);
-        Utils.Render($"{message.ToString()}", x_axis: playerXPosition-4, y_axis:playerYPosition+2, renderSpace:true, bgColor:ConsoleColor.Yellow);
+        Utils.Render($"{message.ToString()}", x_axis: playerXPosition+4, y_axis:playerYPosition+6, renderSpace:true, bgColor:ConsoleColor.Yellow);
     }
     public static void DisplayPlayerMenu(){
         DrawMenu();
@@ -324,13 +325,13 @@ public class Game
 
             activePlayers.ForEach((player)=>{
             if (player.name.ToLower().Equals("dealer")&& renderDealer){
-                yPt = (Table.tableHeight)*40/100;
-                Utils.Render($"Dealer {statement} {player.hands[Game.activeHand]?.GetHandStrength().ToString()} ", x_axis: xPt-2, y_axis:yPt+1, renderSpace:true);   
+                yPt = (Table.tableHeight)*30/100;
+                Utils.Render($"Dealer {statement} {player.hands[Game.activeHand]?.GetHandStrength().ToString()} ", x_axis: xPt-3, y_axis:yPt+1, renderSpace:true);   
             }else if(!player.name.ToLower().Equals("dealer")&&!renderDealer){
                 yPt = (Table.tableHeight)*110/100;
-                Utils.Render($"Balance {player.balance.ToString("c0").Replace(',', '.')}",  x_axis: xPt, y_axis:yPt, renderSpace:true, bgColor:ConsoleColor.Green);
+                Utils.Render($"Balance {player.balance.ToString("c0").Replace(',', '.')}",  x_axis: xPt, y_axis:yPt+5, renderSpace:true, bgColor:ConsoleColor.Green);
                 if(Game.state is State.PlaceBet || Game.state is State.ChooseMove ||Game.state is State.ConfirmWin){
-                    Utils.Render($"{statement} {player.hands[Game.activeHand]?.GetHandStrength().ToString()} ", x_axis: xPt, y_axis:yPt+3, renderSpace:true); 
+                    Utils.Render($"{statement} {player.hands[Game.activeHand]?.GetHandStrength().ToString()} ", x_axis: xPt, y_axis:yPt+10, renderSpace:true); 
                 }
                 
             }
@@ -404,8 +405,9 @@ public class Game
     }
 
     public static Player PreparePlayer(){
-        Utils.Render($"\n Join the game \n", x_axis:(width/3)+(width/10), y_axis:(Game.height/3)+(height/4), bgColor:ConsoleColor.DarkBlue, renderSpace:true);
-        Utils.Write("Enter Player Name:");
+        Utils.Render($"\n    Join the game   \n\n Enter Player Name  ", x_axis:(width/3)+(width/10), y_axis:(Game.height/3)+(height/10), bgColor:ConsoleColor.DarkBlue, renderSpace:true);
+        
+        // Utils.Write("Enter Player Name:");
         string playerName = Utils.Input(" ", required:false, stringType:true);
         Player player = GetOrCreatePlayer(playerName.ToLower().Trim());
         activePlayers.Add(player);
