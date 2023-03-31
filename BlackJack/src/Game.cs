@@ -8,7 +8,7 @@ public class Game
     public static int height = Console.WindowHeight;
     public static int width = Console.WindowWidth;
     public static List<(string playerName,  double balance)> scores = new();
-    public static TimeSpan playerTimeOutSpan = TimeSpan.FromMilliseconds(15000); // 15 second timeout
+    public static TimeSpan playerTimeOutSpan = TimeSpan.FromMilliseconds(15000); // 15 second autoplay timeout
     public static List<Player> activePlayers = new();
     public static Card JackCard = new(){ Colors= Colors.Diamonds, Weight= Weight.Jack };
     public static Stopwatch playerRoundStopWatch = new();
@@ -16,7 +16,7 @@ public class Game
     public static List<Card> deck = new();
     public static Player? dealer;
     public static State state;
-    public static int activeHand = 0;
+    public static int activeHand = 0; // defaults first
     public static int playerXPosition = (width/3)+(width/8);
     // public static int playerXPosition = (Table.tableWidth)*140/100;
     public static int playerYPosition = (Table.tableHeight)*95/100;
@@ -36,7 +36,7 @@ public class Game
         state = State.Intro;
         Setup();
         IntroAnimation();
-        // ShowAchievers();
+        activeHand = 0;
         // assign dealer
         dealer = GetOrCreatePlayer("dealer", 999999);
         activePlayers.Add(dealer); // add it or not??
@@ -149,7 +149,7 @@ public class Game
         return player;
     }
 
-    static void _sanitize_scores(Player player){
+    private static void _sanitize_scores(Player player){
         int idx = scores.FindIndex((p)=>p.balance.Equals(player.name));
         if(idx>=0){scores.RemoveAt(idx);}
         scores.Add((playerName: player.name.ToLower(), balance: player.balance));
@@ -158,12 +158,9 @@ public class Game
     }
     public static void ShowAchievers(){
         // Utils.Render($"Best Records \n\n", x_axis: (width/3)+(width/10), y_axis:(height/3), 
-        Utils.Render($"Best Records \n\n", x_axis: 0, y_axis:0, 
-        renderSpace:true, textColor:ConsoleColor.Blue, bgColor:ConsoleColor.DarkYellow);
+        Utils.Render($"Best Records \n\n", x_axis: 0, y_axis:0, renderSpace:true, textColor:ConsoleColor.Blue, bgColor:ConsoleColor.DarkYellow);
         Utils.Render($"Player \t Score \n");
-        
         int safeRange = scores.Count() >=5 ? 5 : scores.Count() ;
-        
         scores.GetRange(0, safeRange).ForEach((score)=>{
             if(!score.playerName.ToLower().Equals("dealer")){
                 if (scores.First().Equals(score))
@@ -185,17 +182,12 @@ public class Game
     }
     
     public static void PayOut(Player player, double rate=2){
-
         if(!Table.round_paid){
             player.balance += (double) (player.bet)*rate;
             Table.round_paid = true;
         }
-        
         // render paid out
         RenderGameInfo();
-        // Utils.Render($"Winner Winner Chicken Dinner\n)", x_axis:(Game.width/3)+(Game.width/3/3), y_axis:(Game.height/2)+4, textColor:ConsoleColor.Green, renderSpace:true);
-
-
     }
 
     // deal first round
@@ -205,7 +197,6 @@ public class Game
         int index = 0;
         activePlayers.ForEach((player)=>{
             player.hands.Clear();// reset hand to move out incase of split
-
             player.hands?.Add(new Hand(){
                 cards = new (){deck[index], deck[index+1]}
             }); 
@@ -213,23 +204,22 @@ public class Game
         });
         deck.RemoveRange(0,4);
         // should render
-
         RenderDealerCards(); // flipped
         RenderPlayerCards(activePlayers[^1]);
-        Game.RenderGameInfo();
-
+        RenderGameInfo();
     }
 
     public static void DoDoubleDown (Player player){
         DealCard(player);
         player.balance -= player.bet;
         player.bet += player.bet;
-        Utils.Render($"your bet: {player.bet}  ", x_axis:(Table.tableWidth)*105/100, y_axis:(Table.tableHeight)*85/100, renderSpace:true); 
+        Utils.Render($"Your bet: {player.bet}  ", x_axis:(Table.tableWidth)*105/100, y_axis:(Table.tableHeight)*85/100, renderSpace:true); 
         RenderGameInfo();
         if(player.hands[activeHand]?.GetHandStrength() > 21) 
         {
             ConfirmBusted();
         } else {
+            // if has split hand then go next
             TurnToDealer();
         }
     }
@@ -327,6 +317,7 @@ public class Game
                     break;
             }
             DrawMenu(erase:true);
+            if(Game.state == State.ChooseMove)
             DrawMenu();
             // CheckWinner();
         }      
@@ -436,12 +427,16 @@ public class Game
 
     }
     public static void DealerBrain(){
+        // TODO:recurse on split 
+        // get player's the closest hand to win
+        
+
         while(activePlayers[0].hands[0].GetHandStrength()<21 && 
         activePlayers[0].hands[0].GetHandStrength() < activePlayers[^1].hands[0].GetHandStrength()){
             DealCard(activePlayers[0], forDealer:true);
             RenderGameInfo(renderDealer:true);
             CheckWinner();
-            Thread.Sleep(7); // just suspense
+            Thread.Sleep(100); // just suspense
 
         }
         RenderGameInfo(renderDealer:true); // force refresh

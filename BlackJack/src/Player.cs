@@ -35,7 +35,7 @@ public override string ToString()
 public int GetBet(){
         Utils.Render($"", x_axis:(Table.tableWidth)*105/100, y_axis:(Table.tableHeight)*85/100, renderSpace:true);                        
         int get_bet = Utils.Input($"your bet: ", required:true);
-        int safeBet = Math.Min(get_bet, (int) balance);
+        int safeBet = Math.Min(get_bet, (int) balance); // silent all in
         balance -= safeBet;
         bet += safeBet;
         return safeBet;
