@@ -375,6 +375,10 @@ public class Game
         
     }
 
+    public static bool QualifesForBlackJack(){
+        Player player = activePlayers[^1];
+        return player.hands[activeHand].cards.Count()==2 && player.hands[activeHand].GetHandStrength()==21;
+    }
     public static void CheckWinner(){
         
         int dealerScore=0;
@@ -397,7 +401,7 @@ public class Game
       
                 
         if(dealerScore>21){
-             if(player.hands[0].cards.Count()==2){
+             if(QualifesForBlackJack()){
                     Game.state = State.ConfirmDealtBlackjack; // 21
                     Game.PayOut(player, 3);
              }else{
@@ -410,21 +414,23 @@ public class Game
                 if(dealerScore == playerScore){
                     Game.state = State.ConfirmDraw;
                     // return money
-                    Game.PayOut(player, 1.00);
+                    Game.PayOut(player, rate:1.00);
 
                 }
 
                 else if(dealerScore>playerScore){ // dealer higher
                     Game.state = State.ConfirmLoss;
                 }else if(playerScore>dealerScore){
+                    if(QualifesForBlackJack()){
+                        Game.state = State.ConfirmDealtBlackjack; // 21
+                        Game.PayOut(player, rate:3);
+                        return;
+                    }
                     Game.state = State.ConfirmWin; // won
-                    Game.PayOut(player);
+                    Game.PayOut(player, rate:2);
                     // double the bet
-                }else{
-                    // if(player.hands[0].cards.Count()==2)
-                    // Game.state = State.ConfirmDealtBlackjack; // 21
-                    // Game.PayOut(player, 3);
                 }
+                
             }         
 
 

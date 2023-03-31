@@ -21,7 +21,7 @@ public class Tests
 
         // Table table = new Table(Game.activePlayers);
         Card JackCard = new(){ Colors= Colors.Diamonds, Weight= Weight.Jack };
-        Card AceCard = new(){ Colors= Colors.Diamonds, Weight= Weight.Ace };
+        Card AceCard = new(){ Colors= Colors.Diamonds, Weight= Weight.Queen };
 
         player.hands[0].cards.Add(AceCard);
         player.hands[0].cards.Add(JackCard);
@@ -29,7 +29,7 @@ public class Tests
         StringAssert.AreEqualIgnoringCase(player.name, "rs");
         Assert.That(500, Is.EqualTo(player.balance));
         Assert.That(0, Is.EqualTo(player.bet));
-        Assert.That(21, Is.EqualTo(player.hands[0].GetHandStrength()));
+        Assert.That(20, Is.EqualTo(player.hands[0].GetHandStrength()));
         Assert.That(State.Intro, Is.EqualTo(Game.state));
         Game.CheckWinner();
         Assert.That(State.ConfirmWin, Is.EqualTo(Game.state));
