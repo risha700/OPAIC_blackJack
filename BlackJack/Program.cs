@@ -47,8 +47,8 @@ class Play{
                         player.GetBet(); // force bet
                         Game.DealRound(); // should be called once per round
                     }
-                    Game.RenderGameInfo();
                     Game.state = State.ChooseMove;
+                    Game.RenderGameInfo();
                     break; 
 
                 case State.ChooseMove:
@@ -56,11 +56,12 @@ class Play{
                     break;
                 
                 case State.ConfirmBust:    
+                    Game.ConfirmMessage("Busted", ConsoleColor.Red);
                     Game.PlayAgain();
                     break;
 
                 case State.ConfirmLoss:
-                    Game.ConfirmMessage("You Lost!");
+                    Game.ConfirmMessage("You Lost!", ConsoleColor.DarkRed);
                     Game.PlayAgain();
                     break;
                 case State.ConfirmDraw:
@@ -69,12 +70,12 @@ class Play{
                     break;
                 case State.ConfirmWin:
                 // case State.ConfirmWin:
-                    Game.ConfirmMessage("You Won!");
+                    Game.ConfirmMessage("You Won!", ConsoleColor.Green);
                     Game.PlayAgain();
                     break;   
                case State.ConfirmDealtBlackjack:
                 // case State.ConfirmWin:
-                    Game.ConfirmMessage("Black Jack!");
+                    Game.ConfirmMessage("Black Jack!", ConsoleColor.Magenta);
                     Game.PlayAgain();
                     break; 
                 case State.Lobby:

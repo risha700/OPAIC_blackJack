@@ -8,6 +8,8 @@ public class Tests
     {
         Game game = new();
         Game.Setup();
+        Table table = new Table(Game.activePlayers);
+        
     }
 
     [Test]
@@ -124,5 +126,31 @@ public class Tests
     [Test]
     public void TestPlayerSplit()
     {
+        
+
+        // Console.WriteLine($"Is paid Out???? {Table.round_paid}");
+        var player = new Player("rs");
+        Game.activePlayers.Add(player);
+        var dealer = Game.activePlayers[0];
+        // Game.activePlayers.ForEach(p=>Console.Write(p));
+
+        player.bet = 100;
+        player.balance -=100; // was 500
+        Assert.That(400, Is.EqualTo(player.balance));
+        // Table table = new Table(Game.activePlayers);
+        player.hands[0].cards.Add(new(){ Colors= Colors.Clubs, Weight= Weight.Jack });
+        player.hands[0].cards.Add(new(){ Colors= Colors.Diamonds, Weight= Weight.Jack });
+        
+        // can split ??
+        Assert.True(Game.CanSplit());
+        // Assert.That(true, Is.EqualTo(player.balance));
+
+        // busted
+        // dealer.hands[0].cards.Add(new(){ Colors= Colors.Diamonds, Weight= Weight.Ten });
+        // dealer.hands[0].cards.Add(new(){ Colors= Colors.Diamonds, Weight= Weight.Ten });
+        // dealer.hands[0].cards.Add(new(){ Colors= Colors.Spades, Weight= Weight.Three });
+        // Game.CheckWinner();
+        // Assert.That(State.ConfirmDealtBlackjack, Is.EqualTo(Game.state));
+        // Assert.That(700, Is.EqualTo(player.balance));
     }
 }

@@ -17,8 +17,8 @@ public class Game
     public static Player? dealer;
     public static State state;
     public static int activeHand = 0; // defaults first
-    public static int playerXPosition = (width/3)+(width/8);
-    // public static int playerXPosition = (Table.tableWidth)*140/100;
+    // public static int playerXPosition = (width/3)+(width/8);
+    public static int playerXPosition = (Table.tableWidth);
     public static int playerYPosition = (Table.tableHeight)*95/100;
     public static string AboutBlackJack = "\n Blackjack is a casino banking game. \nIt is the most widely played casino \nbanking game in the world. It uses \ndecks of 52 cards and descends from \na global family of casino banking \ngames known as Twenty-One. \nThis family of card games also \nincludes the European games Vingt-et-Un and \nPontoon, and the Russian game Ochko. \n";
     public static string BLACKJACK_BANNER = """
@@ -213,7 +213,7 @@ public class Game
         DealCard(player);
         player.balance -= player.bet;
         player.bet += player.bet;
-        Utils.Render($"Your bet: {player.bet}  ", x_axis:(Table.tableWidth)*105/100, y_axis:(Table.tableHeight)*85/100, renderSpace:true); 
+        Utils.Render($"Your bet: {player.bet}  ", x_axis:(Table.tableWidth)*55/100, y_axis:(Table.tableHeight)*85/100, renderSpace:true); 
         RenderGameInfo();
         if(player.hands[activeHand]?.GetHandStrength() > 21) 
         {
@@ -235,8 +235,8 @@ public class Game
     }
     public static void DrawMenu(bool erase=false){
         Player player = activePlayers[^1];
-        int xPt = (Table.tableWidth)*130/100;
-        int yPt = (Table.tableHeight)*85/100;
+        int xPt = (Table.tableWidth)*90/100;
+        int yPt = (Table.tableHeight)*65/100;
         Utils.DrawRect(8, 4, (xPt+1, yPt));
         Utils.DrawRect(8, 4, (xPt+15, yPt));
         Utils.Render("1. Stay\n", x_axis:xPt+2, y_axis:yPt+1);
@@ -246,8 +246,10 @@ public class Game
             Utils.DrawRect(13, 4, (xPt+30, yPt));
             Utils.Render("3. Double Down", x_axis:xPt+31, y_axis:yPt+1);
         }
- 
-        // Utils.Render("4. Split", x_axis:xPt+16, y_axis:yPt+1);
+        if(CanSplit()){
+            Utils.DrawRect(8, 4, (xPt+30, yPt));
+            Utils.Render("4. Split", x_axis:xPt+43, y_axis:yPt+1);
+        }
         if (erase){
             for (int i = 0; i <= 3; i++)
             {
@@ -259,15 +261,12 @@ public class Game
 
     public static void ConfirmBusted(){
         Player player = activePlayers[^1];
-        DrawMenu(erase:true);
         Game.state = State.ConfirmBust;
-        Utils.Render($"Busted", x_axis: playerXPosition-4, y_axis:playerYPosition+2, renderSpace:true, bgColor:ConsoleColor.Yellow);
-        Utils.Render($"play again! y|yes n|no :  ", x_axis:(Table.tableWidth)*133/100, y_axis:(Table.tableHeight)*85/100, textColor:ConsoleColor.Yellow, renderSpace:true);                        
         player.hands[0] = new();
     }
-    public static void ConfirmMessage(string message){            
+    public static void ConfirmMessage(string message, ConsoleColor level=ConsoleColor.Yellow){            
         DrawMenu(erase:true);
-        Utils.Render($"{message.ToString()}", x_axis: playerXPosition+4, y_axis:playerYPosition+6, renderSpace:true, bgColor:ConsoleColor.Yellow);
+        Utils.Render($"{message.ToString()}", x_axis: playerXPosition, y_axis:playerYPosition+2, renderSpace:true, bgColor:level);
     }
     public static void TurnToDealer(){
         // revert turn to dealer
@@ -284,11 +283,7 @@ public class Game
         DrawMenu();
         var s = Enum.GetNames(typeof(State));
         var predicate = s.Where((v)=> (v == "Lobby" || v == "PlaceBet"|| v == "ChooseMove"));
-            //  while (Game.state is not State.OutOfMoney || Game.state is not State.ConfirmBust || Game.state is not State.ConfirmWin || 
-                // Game.state is not State.ConfirmDealtBlackjack || Game.state is not State.ConfirmLoss||  Game.state is not State.ConfirmDraw); 
-        // stay
-        // hit
-        
+
         while (predicate.Contains(Game.state.ToString()))
         {
             switch (Console.ReadKey(true).Key)
@@ -311,6 +306,9 @@ public class Game
                         DoDoubleDown(player);
                     break;
                 case ConsoleKey.D4 or ConsoleKey.NumPad4: // split when cards are the same and pay the same bet
+                    if(CanSplit()){
+                        //DoSplit();
+                    }
                     break;
                 default:
                     // CheckWinner();
@@ -341,23 +339,25 @@ public class Game
             RenderPlayerCards(player);
         }
         // forDealer?RenderDealerCards(visible:true):RenderPlayerCards(player);
+       
         RenderGameInfo(renderDealer:forDealer);
+
     }
     
     public static void RenderGameInfo(bool erase = false, bool renderDealer=false){
-        int xPt = (Table.tableWidth)*105/100;
-        int yPt = (Table.tableHeight)*110/100;
+        int xPt = (Table.tableWidth)*55/100;
+        int yPt = (Table.tableHeight);
         string statement = "Hand Score";
 
             activePlayers.ForEach((player)=>{
             if (player.name.ToLower().Equals("dealer")&& renderDealer){
                 yPt = (Table.tableHeight)*30/100;
-                Utils.Render($"Dealer {statement} {player.hands[Game.activeHand]?.GetHandStrength().ToString()} ", x_axis: xPt-3, y_axis:yPt+1, renderSpace:true);   
+                Utils.Render($"Dealer {statement} {player.hands[Game.activeHand]?.GetHandStrength().ToString()} ", x_axis: xPt, y_axis:yPt+1, renderSpace:true);   
             }else if(!player.name.ToLower().Equals("dealer")&&!renderDealer){
-                yPt = (Table.tableHeight)*110/100;
-                Utils.Render($"Balance {player.balance.ToString("c0").Replace(',', '.')}",  x_axis: xPt, y_axis:yPt+5, renderSpace:true, bgColor:ConsoleColor.Green);
-                if(Game.state is State.PlaceBet || Game.state is State.ChooseMove ||Game.state is State.ConfirmWin){
-                    Utils.Render($"{statement} {player.hands[Game.activeHand]?.GetHandStrength().ToString()} ", x_axis: xPt, y_axis:yPt+10, renderSpace:true); 
+                yPt = (Table.tableHeight)*85/100;
+                Utils.Render($"Balance {player.balance.ToString("c0").Replace(',', '.')}",  x_axis: xPt, y_axis:yPt+2, renderSpace:true, bgColor:ConsoleColor.Green);
+                if( Game.state is State.ChooseMove ||Game.state is State.ConfirmWin){
+                    Utils.Render($"{statement} {player.hands[Game.activeHand]?.GetHandStrength().ToString()} ", x_axis: xPt, y_axis:yPt+4, renderSpace:true); 
                 }
                 
             }
@@ -365,10 +365,14 @@ public class Game
         });
         
     }
-
+    public static bool CanSplit(){
+        Player player = activePlayers[^1];
+        return (bool)(player.hands[activeHand].cards.Count()==2&&
+            player.hands[activeHand].cards[0].Weight == player.hands[activeHand].cards[1].Weight);
+    }
     public static bool QualifesForBlackJack(){
         Player player = activePlayers[^1];
-        return player.hands[activeHand].cards.Count()==2 && player.hands[activeHand].GetHandStrength()==21;
+        return (bool)(player.hands[activeHand].cards.Count()==2 && player.hands[activeHand].GetHandStrength()==21);
     }
     public static void CheckWinner(){
         
@@ -459,7 +463,7 @@ public class Game
     public static void RenderPlayerCards(Player player){            
         for (int h=0; h<player.hands.Count();h++){
             for (int i=0; i<player.hands[h].cards.Count();i++)
-                Utils.Render($"{Utils.Stringify(player.hands[h].cards[i].BuildCard())}", x_axis: playerXPosition+(i*3)+h, y_axis:playerYPosition+3,renderSpace:true);
+                Utils.Render($"{Utils.Stringify(player.hands[h].cards[i].BuildCard())}", x_axis: playerXPosition+(i*3)+h, y_axis:playerYPosition,renderSpace:true);
             if(Game.state.Equals(State.ConfirmSplit))
                 playerXPosition+=(h+1)*h;
         }
@@ -468,8 +472,8 @@ public class Game
     public static void RenderDealerCards(bool visible= false){
         bool shouldFlip = visible;
         Player player = activePlayers[0];
-        int dealerXPosition = (Table.tableWidth)*140/100;
-        int dealerYPosition = (Table.tableHeight)*44/100;
+        int dealerXPosition = (Table.tableWidth);
+        int dealerYPosition = (Table.tableHeight)*23/100;
         for (int h=0; h<player.hands.Count();h++){
             for (int i=0; i<player.hands[h].cards.Count();i++){
                 if(i==0 && !visible ) {
@@ -487,7 +491,7 @@ public class Game
 
     }
     public static void MainMenu(){
-        int xPt = (Table.tableWidth)*100/100;
+        int xPt = (Table.tableWidth)*55/100;
         int yPt = (Table.tableHeight)*99/100;
         Utils.DrawRect(20, 4, (xPt, yPt));
         Utils.Render("I. How to play\n", x_axis:xPt+2, y_axis:yPt+1);
@@ -522,6 +526,7 @@ public class Game
 
         }
     
+    // clear screen at x,y
      void clear(int x=-1, int y=-1, dynamic? areax=null, dynamic? areay=null){
          (int h, int v) area = (h:100, v:20);
          
@@ -557,7 +562,7 @@ public class Game
         });
         
 
-        Utils.Render($"play again! y|yes n|no :  ", x_axis:(Table.tableWidth)*133/100, y_axis:(Table.tableHeight)*85/100,
+        Utils.Render($"Play again? y|yes n|no  ", x_axis:(Table.tableWidth)*90/100, y_axis:(Table.tableHeight)*70/100,
                     textColor:ConsoleColor.DarkBlue, bgColor:ConsoleColor.Cyan , renderSpace:true);
         switch(Console.ReadKey(true).Key){
             case (ConsoleKey.Y):
