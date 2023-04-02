@@ -39,6 +39,7 @@ public int GetBet(){
         int safeBet = Math.Min(get_bet, (int) balance); // silent all in
         balance -= safeBet;
         bet += safeBet;
+        Table.base_bet = safeBet;
         return safeBet;
 
     }

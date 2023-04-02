@@ -90,7 +90,7 @@ class Play{
 
         }while(Game.state is not State.OutOfMoney);
         // Console.Clear();
-        Utils.Write($"\n Game Over {Utils.Capitalize(Game.activePlayers[^1].name)}!, you are out of money :(", x_axis:(Game.width/3) + 24, y_axis:(Game.height/2), color: ConsoleColor.DarkYellow);
+        Utils.Write($"\n Game Over {Utils.Capitalize(Game.activePlayers[^1].name)}!, {Game.exitMessage}:(", x_axis:(Game.width/3) + 24, y_axis:(Game.height/2), color: ConsoleColor.DarkYellow);
         Game.ProcessScores();
         Console.CursorVisible = true; // reset
             

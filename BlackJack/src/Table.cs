@@ -3,6 +3,7 @@ namespace BlackJack;
 public class Table 
 {
     public static bool round_paid;
+    public static int base_bet;
     List<Player> players = new();
     public static int tableWidth = Console.WindowWidth/2;
     public static int tableHeight = (int) Math.Min(((Console.WindowHeight/2) * 2), 20);
