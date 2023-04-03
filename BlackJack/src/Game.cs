@@ -22,7 +22,14 @@ public class Game
     // public static int playerXPosition = (width/3)+(width/8);
     public static int playerXPosition = (Table.tableWidth);
     public static int playerYPosition = (Table.tableHeight)*95/100;
-    public static string AboutBlackJack = "\n Blackjack is a casino banking game. \nIt is the most widely played casino \nbanking game in the world. It uses \ndecks of 52 cards and descends from \na global family of casino banking \ngames known as Twenty-One. \nThis family of card games also \nincludes the European games Vingt-et-Un and \nPontoon, and the Russian game Ochko. \n";
+    // public static string AboutBlackJack = "\n Blackjack is a casino banking game. \nIt is the most widely played casino \nbanking game in the world. It uses \ndecks of 52 cards and descends from \na global family of casino banking \ngames known as Twenty-One. \nThis family of card games also \nincludes the European games Vingt-et-Un and \nPontoon, and the Russian game Ochko. \n";
+    public static string AboutBlackJack = "Blackjack is a casino game \nWhen you play against the dealer. \n"+
+                                          "the closest to 21 hand strenght wins,\nhand payout 2 to 1 and if blackjack 3 to 1. \n"+
+                                          "How to Play?\n\n"+
+                                          "Hit: Take another card.\n"+
+                                          "Stand: Take no more cards. also known as \"stay\".\n"+
+                                          "Double down: Increase the initial bet by 100%\nand take exactly one more card.\n"+
+                                          "Split: Create two hands from a starting hand \nwhere both cards are the same value";
     public static string BLACKJACK_BANNER = """
             _______  ___      _______  _______  ___   _   
             |  _    ||   |    |   _   ||       ||   | | | 
@@ -123,7 +130,7 @@ public class Game
         else
         {
             var player =  Game.activePlayers[^1];            
-            _sanitize_scores(player);
+            _SanitizeScores(player);
             int player_idx = scores.FindIndex((p)=>p.playerName.ToLower().Equals(player.name.ToLower()));
             if(player_idx > -1){ // update latest info
                 scores.RemoveAt(player_idx);
@@ -148,11 +155,11 @@ public class Game
         scores.Sort((a, b) => b.balance.CompareTo(a.balance));
         (string playerName, double balance) p = scores.Find(p=>p.playerName == pName);
         Player player = new Player(p.playerName, p.balance);
-        _sanitize_scores(player);
+        _SanitizeScores(player);
         return player;
     }
 
-    private static void _sanitize_scores(Player player){
+    private static void _SanitizeScores(Player player){
         int idx = scores.FindIndex((p)=>p.balance.Equals(player.name));
         if(idx>=0){scores.RemoveAt(idx);}
         scores.Add((playerName: player.name.ToLower(), balance: player.balance));
@@ -160,7 +167,7 @@ public class Game
         scores.Sort((a, b) => b.balance.CompareTo(a.balance));
     }
     public static void ShowAchievers(){
-        Utils.Render($"Best Records \n\n", x_axis: 0, y_axis:0, renderSpace:true, textColor:ConsoleColor.Blue, bgColor:ConsoleColor.DarkYellow);
+        Utils.Render($"Best Records \n\n", x_axis: 3, y_axis:3, renderSpace:true, textColor:ConsoleColor.Blue, bgColor:ConsoleColor.DarkYellow);
         Utils.Render($"Player \t Score \n");
         int safeRange = scores.Count() >=5 ? 5 : scores.Count() ;
         scores.GetRange(0, safeRange).ForEach((score)=>{
@@ -188,10 +195,11 @@ public class Game
         if(!Table.round_paid){
             player.balance += (double) amount;
             Table.round_paid = true;
+            // render paid out
+            RenderGameInfo();
+            Utils.Render($"+{amount:c}", x_axis:((Table.tableWidth)*65/100), y_axis:(Table.tableHeight)*85/100, bgColor:ConsoleColor.Yellow, renderSpace:true);
         }
-        // render paid out
-        RenderGameInfo();
-        Utils.Render($"+{amount:c}", x_axis:((Table.tableWidth)*65/100), y_axis:(Table.tableHeight)*85/100, bgColor:ConsoleColor.Yellow, renderSpace:true);
+        
     }
 
     // deal first round
@@ -297,6 +305,7 @@ public class Game
             }
 
         }else{
+            // normal fallback
             Game.state = State.ConfirmBust;
             player.hands[0] = new();
         }
@@ -356,10 +365,11 @@ public class Game
                         DoDoubleDown(player);
                     break;
                 case ConsoleKey.D4 or ConsoleKey.NumPad4: // split when cards are the same and pay the same bet
-                    if(CanSplit())
+                    if(CanSplit()){
+                        DrawMenu(erase:true);
                         DoSplit();
                         DrawMenu();
-
+                    }
                     break;
                 default:
                     break;
@@ -396,7 +406,7 @@ public class Game
         int xPoint = playerXPosition+(playerXPosition*((activeHand*20))/100);
         int yPoint = (Table.tableHeight);
         if(force_clear){
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 4; i++)
                 {
                     Utils.Render("                     ", x_axis: xPoint-20+i, y_axis:yPoint+8+i, erase:true); 
                         Utils.Render("                 ", x_axis: xPoint+i, y_axis:yPoint+8+i, erase:true); 
@@ -408,11 +418,12 @@ public class Game
         // int xPoint = playerXPosition+(playerXPosition*((activeHand*20))/100);
         if(!dealer_turn)
         Utils.Render(
-                    " /\\ \n"+
-                    "//\\\\ \n "+ 
-                    "|| ", x_axis: xPoint+2, y_axis:yPoint+8, renderSpace:true, textColor:ConsoleColor.Yellow); 
+            "     .\n"+
+            "   .:::.\n"+
+            " .:::::::.\n"+
+            "   ::::: \n", x_axis: xPoint+2, y_axis:yPoint+8, renderSpace:true, textColor:ConsoleColor.Green); 
         // if(Game.state is State.ConfirmSplit)
-        for (int i = 0; i < 3; i++)
+        for (int i = 0; i < 4; i++)
         {
             Utils.Render("                     ", x_axis: xPoint-20+i, y_axis:yPoint+8+i, erase:true); 
 
@@ -436,16 +447,16 @@ public class Game
                 if( Game.state is State.ChooseMove ||Game.state is State.ConfirmWin){
                     Utils.Render($"{statement} {player.hands[Game.activeHand]?.GetHandStrength().ToString()} ", x_axis: xPt, y_axis:yPt+4, renderSpace:true); 
                     // add arrow indicates active hand
-                    ActiveIndicator(); // first show turn
+                    // ActiveIndicator(); // first show turn
                 }else if (Game.state is State.ConfirmSplit){
-                    ActiveIndicator(); // first show turn
+                    // ActiveIndicator(); // first show turn
                     Utils.Render($"                            ", x_axis: (Table.tableWidth)*55/100, y_axis:yPt+4, renderSpace:true); // delete normal score
                     xPt = playerXPosition+(playerXPosition*((activeHand*20))/100);
                     Utils.Render($"{statement} {player.hands[Game.activeHand]?.GetHandStrength().ToString()} ", x_axis: xPt, y_axis:(yPt+10), renderSpace:true, bgColor:ConsoleColor.Cyan);
                     // if active hand is current draw arrow
                     // if(player.hands[activeHand]== )
                 }
-                
+                ActiveIndicator(); // first show turn
             }
 
         });
@@ -453,7 +464,7 @@ public class Game
         // ActiveIndicator(); // first show turn
         
     }
-     public static void DoSplit(){
+     public static void DoSplit(bool testing=false){
         // collect bet
         var player = activePlayers[^1];
         var hands = player.hands;
@@ -481,6 +492,7 @@ public class Game
         {
             activeHand = i;
             RenderGameInfo();  
+            if(!testing)
             DisplayPlayerMenu();
             
         }
@@ -655,8 +667,8 @@ public class Game
             case ConsoleKey.I: // how to play
                 // show info inside switch
                 clear();
-                Console.SetCursorPosition(0,0);
-                Console.WriteLine(Game.AboutBlackJack);
+                Console.SetCursorPosition(3,3);
+                Utils.Render(Game.AboutBlackJack, x_axis:3, y_axis:3, textColor:ConsoleColor.Green);
                 Utils.Write("press B: to go back to lobby", x_axis:0, y_axis:width/2);
                 MainMenu();
                 break;

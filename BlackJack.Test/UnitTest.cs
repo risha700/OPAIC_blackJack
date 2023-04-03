@@ -141,9 +141,24 @@ public class Tests
         player.hands[0].cards.Add(new(){ Colors= Colors.Clubs, Weight= Weight.Jack });
         player.hands[0].cards.Add(new(){ Colors= Colors.Diamonds, Weight= Weight.Jack });
         
+        Game.deck[0] = new(){ Colors= Colors.Diamonds, Weight= Weight.Ten };
+        Game.deck[1] = new(){ Colors= Colors.Diamonds, Weight= Weight.Five };
+        
         // can split ??
         Assert.True(Game.CanSplit());
-        // Assert.That(true, Is.EqualTo(player.balance));
+        Game.DoSplit(true);        
+        
+        Assert.That(200, Is.EqualTo(player.bet));
+        Assert.That(200, Is.EqualTo(player.bet));
+        Assert.That(2, Is.EqualTo(player.hands.Count()));
+        Assert.That(2, Is.EqualTo(player.hands[0].cards.Count()));
+
+        Assert.That(20, Is.EqualTo(player.hands[0].GetHandStrength()));
+        Assert.That(15, Is.EqualTo(player.hands[1].GetHandStrength()));
+
+        Game.CheckWinner();
+        // need to out the original bet only for one hand
+        Assert.That(400, Is.EqualTo(player.balance));
 
         // busted
         // dealer.hands[0].cards.Add(new(){ Colors= Colors.Diamonds, Weight= Weight.Ten });

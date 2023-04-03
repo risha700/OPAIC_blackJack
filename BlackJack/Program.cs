@@ -3,13 +3,13 @@
     Date: March 13, 2023
 */
 
-// using System;
-// using System.IO;
-// using System.Linq;
-// using System.Collections;
-// using System.Drawing;
-// using System.Diagnostics;
-// using System.Threading;
+using System;
+using System.IO;
+using System.Linq;
+using System.Collections;
+using System.Drawing;
+using System.Diagnostics;
+using System.Threading;
 
 
 // public delegate void Notify();  // delegate
@@ -89,8 +89,9 @@ class Play{
 
 
         }while(Game.state is not State.OutOfMoney);
-        // Console.Clear();
-        Utils.Write($"\n Game Over {Utils.Capitalize(Game.activePlayers[^1].name)}!, {Game.exitMessage}:(", x_axis:(Game.width/3) + 24, y_axis:(Game.height/2), color: ConsoleColor.DarkYellow);
+        Console.Clear();
+        Utils.Render($"Game Over {Utils.Capitalize(Game.activePlayers[^1].name)}! {Game.exitMessage} :(\n",
+        x_axis:(Game.width/3)+10, y_axis:3, bgColor: ConsoleColor.DarkBlue, renderSpace:true);
         Game.ProcessScores();
         Console.CursorVisible = true; // reset
             
