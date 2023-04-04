@@ -1,4 +1,6 @@
 # OPAIC_blackJack
+[![.NET](https://github.com/risha700/OPAIC_blackJack/actions/workflows/dotnet.yml/badge.svg)](https://github.com/risha700/OPAIC_blackJack/actions/workflows/dotnet.yml)
+
 ## Otago Polytechnic - OPAIC BIT Programing 1 Final Submission
 ---
 ## The Motive
