@@ -1,6 +1,7 @@
 @startuml
 class Table {
     + {static} round_paid : bool
+    + {static} base_bet : int
     + {static} tableWidth : int
     + {static} tableHeight : int
     + Table(PlayerList:List<Player>)

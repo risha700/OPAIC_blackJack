@@ -59,25 +59,19 @@ while (Game.state is not OutOfMoney)
                             end group    
                             
                         case (Key.3)    
-                            :double down
-                            *Not Implemented;
+                            :double down;
+                            :DoDoubleDown;
                         case (Key.4) 
-                            :Split
-                            *Not Implemented;
+                            :Split;
+                            :DoSplit;
+
                     endswitch
                     endwhile
                     
                 
             end group
-        case ( State.ConfirmBust )
-        :Game.PlayAgain();
-        case ( State.ConfirmLoss )
-        :Game.PlayAgain();
-        case ( State.ConfirmDraw )
-        :Game.PlayAgain();
-        case ( State.ConfirmWin )
-        :Game.PlayAgain();
-        case ( State.ConfirmDealtBlackjack )
+        case ( State.ConfirmBust or  State.ConfirmLoss or State.ConfirmDraw or State.ConfirmWin or State.ConfirmDealtBlackjack )
+        :Show Message;
         :Game.PlayAgain();
         case ( State.Lobby )
         :Game.Restart();

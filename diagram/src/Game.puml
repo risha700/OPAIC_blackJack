@@ -2,11 +2,13 @@
 class Game {
     + {static} height : int
     + {static} width : int
+    + {static} dealer_turn : bool = false
+    + {static} exitMessage : string = "You are out of money"
     + {static} dealer : Player?
     + {static} activeHand : int = 0
     + {static} playerXPosition : int
     + {static} playerYPosition : int
-    + {static} AboutBlackJack : string = "\n Blackjack is a casino banking game. \nIt is the most widely played casino \nbanking game in the world. It uses \ndecks of 52 cards and descends from \na global family of casino banking \ngames known as Twenty-One. \nThis family of card games also \nincludes the European games Vingt-et-Un and \nPontoon, and the Russian game Ochko. \n"
+    + {static} AboutBlackJack : string
     + {static} BLACKJACK_BANNER : string = ""
     + Game()
     +  <<event>> GameOver : EventHandler? 
@@ -18,19 +20,27 @@ class Game {
     + {static} Setup(read_scores:bool) : void
     + {static} ProcessScores(fileName:string, read:bool) : void
     + {static} GetOrCreatePlayer(pName:string, startingBalance:double) : Player
-    {static} _sanitize_scores(player:Player) : void
+    - {static} _SanitizeScores(player:Player) : void
     + {static} ShowAchievers() : void
     + {static} Shuffle(cards:List<Card>) : void
-    + {static} PayOut(player:Player, multiply:double) : void
+    + {static} PayOut(player:Player, hand:Hand, rate:double) : void
     + {static} DealRound() : void
+    + {static} DoDoubleDown(player:Player) : void
+    + {static} CanDoubleDown() : bool
     + {static} DrawMenu(erase:bool) : void
     + {static} ConfirmBusted() : void
-    + {static} ConfirmMessage(message:string) : void
+    + {static} ConfirmMessage(message:string, level:ConsoleColor) : void
+    + {static} TurnToDealer() : void
     + {static} DisplayPlayerMenu() : void
     + {static} DealCard(player:Player, hand:int, forDealer:bool) : void
+    {static} ActiveIndicator(force_clear:bool) : void
     + {static} RenderGameInfo(erase:bool, renderDealer:bool) : void
+    + {static} DoSplit(testing:bool) : void
+    + {static} CanSplit() : bool
+    + {static} QualifesForBlackJack() : bool
     + {static} CheckWinner() : void
     + {static} DealerBrain() : void
+    + {static} ProcessBets(player:Player) : void
     + {static} GameOverHandler(sender:object, e:EventArgs) : void
     + {static} PreparePlayer() : Player
     + {static} RenderPlayerCards(player:Player) : void

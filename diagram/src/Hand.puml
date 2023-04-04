@@ -1,5 +1,7 @@
 @startuml
 class Hand {
+    + bet : double
+    + is_doubled : bool
     + {static} strenght : int
     + <<override>> ToString() : string
     + TranslateCard(card:Card) : int

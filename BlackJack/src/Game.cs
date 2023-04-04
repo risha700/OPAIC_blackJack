@@ -190,14 +190,19 @@ public class Game
         }
     }
     
-    public static void PayOut(Player player, double rate=2){
-        var amount = (player.bet)*rate;
+    public static void PayOut(Player player,Hand hand, double rate=2){
+        var amount = hand.bet*rate;
+        // Console.WriteLine($"Player {player.name} hand count {player.hands.Count()} and currentHand is {hand} rate is {rate} amounbt is {amount} handbet {hand.bet}");
+
         if(!Table.round_paid){
+            // Utils.Write($"DEBUG: Called Payout hand {hand}",x_axis:0, y_axis:0+2*player.hands.IndexOf(hand));
             player.balance += (double) amount;
-            Table.round_paid = true;
+            Table.round_paid = player.hands.Count()-1 == player.hands.IndexOf(hand);
+            // Table.round_paid = true;
             // render paid out
-            RenderGameInfo();
-            Utils.Render($"+{amount:c}", x_axis:((Table.tableWidth)*65/100), y_axis:(Table.tableHeight)*85/100, bgColor:ConsoleColor.Yellow, renderSpace:true);
+            // RenderGameInfo();
+            if(Table.round_paid)
+            Utils.Render($"+{amount:c}", x_axis:((Table.tableWidth)*70/100), y_axis:(Table.tableHeight)*85/100, bgColor:ConsoleColor.Yellow, renderSpace:true);
         }
         
     }
@@ -207,11 +212,10 @@ public class Game
         Setup(); // reset deck
         Shuffle(deck);
         int index = 0;
-        // testing split
-        // deck[2] = new Card(){Weight=Weight.Ace,Colors=Colors.Clubs, visible=true };
-        // deck[3] = new Card(){Weight=Weight.Ace,Colors=Colors.Hearts, visible=true };
-        // deck[4] = new Card(){Weight=Weight.Ace,Colors=Colors.Diamonds, visible=true };
-
+        // live testing split
+        // deck[2] = new Card(){Weight=Weight.Seven,Colors=Colors.Clubs, visible=true };
+        // deck[3] = new Card(){Weight=Weight.Seven,Colors=Colors.Hearts, visible=true };
+        // deck[5] = new Card(){Weight=Weight.Seven,Colors=Colors.Diamonds, visible=true };
 
         activePlayers.ForEach((player)=>{
             player.hands.Clear();// reset hand to move out incase of split
@@ -220,18 +224,26 @@ public class Game
             }); 
             index+=2;
         });
+        // set hand bet
+        ProcessBets(activePlayers[^1]);
+
         deck.RemoveRange(0,4);
+
         // should render
         RenderDealerCards(); // flipped
+        // activePlayers[^1].hands[activeHand].bet = activePlayers[^1].bet;
+        
         RenderPlayerCards(activePlayers[^1]);
         RenderGameInfo();
     }
 
     public static void DoDoubleDown (Player player){
         DealCard(player, activeHand);
-        player.balance -= player.bet;
-        player.bet += player.bet;
-        Utils.Render($"Your bet: {player.bet}  ", x_axis:(Table.tableWidth)*55/100, y_axis:(Table.tableHeight)*85/100, renderSpace:true); 
+        // player.balance -= player.bet;
+        // player.bet += player.bet;
+        player.hands[activeHand].is_doubled = true;
+        ProcessBets(player);
+        Utils.Render($"Your bet: {player.hands.Sum((h)=>h.bet)}  ", x_axis:(Table.tableWidth)*55/100, y_axis:(Table.tableHeight)*85/100, renderSpace:true); 
         RenderGameInfo();
         if(player.hands[activeHand]?.GetHandStrength() > 21) 
         {
@@ -468,30 +480,30 @@ public class Game
         // collect bet
         var player = activePlayers[^1];
         var hands = player.hands;
-        
-        // current hand and next
-        // if (Game.state is State.ConfirmSplit){
-        //     hands = player.hands.GetRange(activeHand, hands.Count());
-        // }
         Game.state = State.ConfirmSplit;
-        player.bet += player.bet;
-        player.balance -= player.bet;
-        Utils.Render($"Your bet: {player.bet}  ", x_axis:(Table.tableWidth)*55/100, y_axis:(Table.tableHeight)*85/100, renderSpace:true); 
-        RenderGameInfo();
-
-        // split cards  and add hand
         hands.Add(new Hand(){
             cards = new (){hands[activeHand].cards[1]}
         });
+        ProcessBets(player); // sets current active hand bet
+        player.hands[activeHand+1].bet = player.bet;
+
+        // Utils.Render($"Your bet: {player.bet}  ", x_axis:0, y_axis:0, renderSpace:true); 
+        // Utils.Render($"Your activeHand {activeHand} handbet: {player.hands[activeHand].bet}  ", x_axis:0, y_axis:0, renderSpace:true); 
+        Utils.Render($"Your bet: {hands.Sum((h)=>h.bet)}  ", x_axis:(Table.tableWidth)*55/100, y_axis:(Table.tableHeight)*85/100, renderSpace:true); 
+        // RenderGameInfo();
+
+        // split cards  and add hand
+    
         hands[activeHand].cards.RemoveAt(1);
         DealCard(player, activeHand);
-        DealCard(player, (hands.Count()-1)); // add to the new hand
+        // DealCard(player, (hands.Count()-1)); // add to the new hand
+        DealCard(player, activeHand+1); // add to the new hand
         DrawMenu(erase:true);
-        // this loop should get out
-        for (int i = 0; i < hands.Count(); i++)
+        // start from current hand in case of complex split
+        for (int i = Math.Max(activeHand, 0); i < player.hands.Count(); i++)
         {
-            activeHand = i;
-            RenderGameInfo();  
+            Game.activeHand = i; 
+            RenderGameInfo();
             if(!testing)
             DisplayPlayerMenu();
             
@@ -509,58 +521,58 @@ public class Game
         return (bool)(player.hands[activeHand].cards.Count()==2 && player.hands[activeHand].GetHandStrength()==21);
     }
     public static void CheckWinner(){
-        
-        int dealerScore=0;
-        int playerScore=0;
+
         Player player = activePlayers[^1];
         Player dealer = activePlayers[0];
-        // TODO: handle split
-        activePlayers.ForEach((player)=>{
-            player.hands.ForEach((hand)=>{
-                if(player.name.Equals("dealer")){
-                    dealerScore = (int) hand.GetHandStrength();
-                }else{
-                    playerScore = (int) hand.GetHandStrength();
-                }
-                
-            });
+        int playerScore=0;
+        int dealerScore=dealer.hands[0].GetHandStrength();
+ 
+        player.hands.ForEach((hand)=>{
+                if (hand.GetHandStrength()<=21)
+                playerScore = (int) hand.GetHandStrength();
+                _DoCheck(dealerScore, playerScore, hand);
+            
         });
+
         
-        bool LessOrEqual21 = (dealerScore <= 21 && playerScore<=21) ;// && (dealerScore>17|| (dealerScore<17&&dealerScore>=playerScore)));
-      
+        void _DoCheck(int dealerScore, int playerScore, Hand hand, bool persistState=true){
+
+            bool LessOrEqual21 = (dealerScore <= 21 && playerScore<=21) ;// && (dealerScore>17|| (dealerScore<17&&dealerScore>=playerScore)));
+            bool LastHand = player.hands.Count()-1 == player.hands.IndexOf(hand);
                 
-        if(dealerScore>21){
-             if(QualifesForBlackJack()){
-                    Game.state = State.ConfirmDealtBlackjack; // 21
-                    Game.PayOut(player, 3);
-             }else{
-                    Game.state = State.ConfirmWin; // dealer bust
-                    Game.PayOut(player);
-             }
-        }
-        if(LessOrEqual21){
-
-                if(dealerScore == playerScore){
-                    Game.state = State.ConfirmDraw;
-                    // return money
-                    Game.PayOut(player, rate:1.00);
-
-                }
-
-                else if(dealerScore>playerScore){ // dealer higher
-                    Game.state = State.ConfirmLoss;
-                }else if(playerScore>dealerScore){
-                    if(QualifesForBlackJack()){
+            if(dealerScore>21){
+                if(QualifesForBlackJack()){
                         Game.state = State.ConfirmDealtBlackjack; // 21
-                        Game.PayOut(player, rate:3);
-                        return;
-                    }
-                    Game.state = State.ConfirmWin; // won
-                    Game.PayOut(player, rate:2);
-                    // double the bet
+                        Game.PayOut(player,hand, 3);
+                }else{
+                        Game.state = State.ConfirmWin; // dealer bust
+                        Game.PayOut(player, hand, rate:hand.is_doubled?4.00:2.00);
                 }
-                
-            }         
+            }
+            if(LessOrEqual21){
+
+                    if(dealerScore == playerScore){
+                        Game.state = State.ConfirmDraw;
+                        // return money
+                        Game.PayOut(player, hand, rate:hand.is_doubled?2:1);
+
+                    }
+
+                    else if(dealerScore>playerScore){ // dealer higher
+                        Game.state = State.ConfirmLoss;
+                    }else if(playerScore>dealerScore){
+                        if(QualifesForBlackJack()){
+                            Game.state = State.ConfirmDealtBlackjack; // 21
+                            Game.PayOut(player, hand, rate:3);
+                            return;
+                        }
+                        Game.state = State.ConfirmWin; // won
+                        Game.PayOut(player, hand, rate:hand.is_doubled?4:2);
+                        // double the bet
+                    }
+                    
+            } 
+        }        
 
 
     }
@@ -569,10 +581,15 @@ public class Game
         // activeHand = 0;
         var playerHands = activePlayers[^1].hands;
         playerHands.Sort((handA, handB)=>handB.GetHandStrength().CompareTo(handA.GetHandStrength()));
-        // var idx = playerHands.FindLastIndex((h)=>h.GetHandStrength()>21);
-        // playerHands[0] = playerHands[idx+1];
-        playerHands.RemoveAll((h)=>h.GetHandStrength()>21); // needs a cchange
-        // if(playerHands.Count()==0){Game.state = State.ConfirmBust;}
+        // playerHands.RemoveAll((h)=>h.GetHandStrength()>21); // needs a cchange
+         playerHands = playerHands.SkipWhile(x=>x.GetHandStrength()>21)
+                    .Concat(playerHands.TakeWhile(x=>x.GetHandStrength()==21))
+                    .Concat(playerHands.TakeWhile(x=>x.GetHandStrength()<21))
+                    .Concat(playerHands.TakeWhile(x=>x.GetHandStrength()>21))
+                    .ToList();
+        
+        // playerHands = playerHands.OrderBy(h => h.GetHandStrength()==21).ThenBy(h=>h.GetHandStrength()<21).ThenBy(h=>h.GetHandStrength()>21).ToList();
+    
         
         while(activePlayers[0].hands[0].GetHandStrength()<21 && 
         activePlayers[0].hands[0].GetHandStrength() < activePlayers[^1]?.hands[0]?.GetHandStrength()){
@@ -580,11 +597,26 @@ public class Game
             RenderGameInfo(renderDealer:true);
             CheckWinner();
             Thread.Sleep(50); // just suspense
-
+            
+            // playerHands.ForEach(h=>Console.WriteLine($"Hand here is {h}"));
         }
         RenderGameInfo(renderDealer:true); // force refresh
     
         
+    }
+
+    public static void ProcessBets(Player player){
+        if(player.hands[activeHand].is_doubled ){
+            player.hands[activeHand].bet += player.bet;
+        }else{
+            player.hands[activeHand].bet = player.bet;
+        }
+        // Console.WriteLine($"DEBUG: player active hand {activeHand} activehandbet {player.hands[activeHand].bet }");
+        player.balance -= player.hands[activeHand].bet;   
+
+        // if(!isFirst)     
+        //     player.bet += player.hands[activeHand].bet; // this will double it
+
     }
     public static void GameOverHandler(object sender, EventArgs e){
         Console.WriteLine("Game Over");
@@ -700,6 +732,7 @@ public class Game
     public static void PlayAgain(){
         Game.ProcessScores(); // save 
         Game.dealer_turn = false;
+        Table.round_paid = false;
 
         if(Game.activePlayers[^1].balance <=0){
             Game.state = State.OutOfMoney;

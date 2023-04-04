@@ -107,6 +107,7 @@ public class Tests
         Game.activePlayers.Add(player);
         var dealer = Game.activePlayers[0];
         player.bet = 100;
+        player.hands[0].bet = 100;
         player.balance -=100; // was 500
         Assert.That(400, Is.EqualTo(player.balance));
         // // Table table = new Table(Game.activePlayers);
@@ -132,9 +133,12 @@ public class Tests
         var player = new Player("rs");
         Game.activePlayers.Add(player);
         var dealer = Game.activePlayers[0];
+        dealer.hands[0].cards.Add(new(){ Colors= Colors.Diamonds, Weight= Weight.Nine });
+        dealer.hands[0].cards.Add(new(){ Colors= Colors.Diamonds, Weight= Weight.Ten });
         // Game.activePlayers.ForEach(p=>Console.Write(p));
 
         player.bet = 100;
+        player.hands[0].bet = 100;
         player.balance -=100; // was 500
         Assert.That(400, Is.EqualTo(player.balance));
         // Table table = new Table(Game.activePlayers);
@@ -148,17 +152,20 @@ public class Tests
         Assert.True(Game.CanSplit());
         Game.DoSplit(true);        
         
-        Assert.That(200, Is.EqualTo(player.bet));
-        Assert.That(200, Is.EqualTo(player.bet));
+        // Assert.That(200, Is.EqualTo(player.bet));
+        Assert.That(100, Is.EqualTo(player.hands[0].bet));
+        Assert.That(100, Is.EqualTo(player.hands[1].bet));
+        // Assert.That(200, Is.EqualTo(player.bet));
         Assert.That(2, Is.EqualTo(player.hands.Count()));
         Assert.That(2, Is.EqualTo(player.hands[0].cards.Count()));
 
         Assert.That(20, Is.EqualTo(player.hands[0].GetHandStrength()));
         Assert.That(15, Is.EqualTo(player.hands[1].GetHandStrength()));
+        Assert.That(19, Is.EqualTo(dealer.hands[0].GetHandStrength()));
 
         Game.CheckWinner();
         // need to out the original bet only for one hand
-        Assert.That(400, Is.EqualTo(player.balance));
+        Assert.That(500, Is.EqualTo(player.balance));
 
         // busted
         // dealer.hands[0].cards.Add(new(){ Colors= Colors.Diamonds, Weight= Weight.Ten });
@@ -168,4 +175,77 @@ public class Tests
         // Assert.That(State.ConfirmDealtBlackjack, Is.EqualTo(Game.state));
         // Assert.That(700, Is.EqualTo(player.balance));
     }
+    
+    [Test]
+    public void TestPlayerSplitComplex()
+    {
+        
+
+        // Console.WriteLine($"Is paid Out???? {Table.round_paid}");
+        var player = new Player("rs");
+        Game.activePlayers.Add(player);
+        var dealer = Game.activePlayers[0];
+        dealer.hands[0].cards.Add(new(){ Colors= Colors.Diamonds, Weight= Weight.Nine });
+        dealer.hands[0].cards.Add(new(){ Colors= Colors.Diamonds, Weight= Weight.Ten });
+        // Game.activePlayers.ForEach(p=>Console.Write(p));
+
+        player.bet = 100;
+        player.hands[0].bet = 100;
+        player.balance -=100; // was 500
+        Assert.That(400, Is.EqualTo(player.balance));
+        // Table table = new Table(Game.activePlayers);
+        player.hands[0].cards.Add(new(){ Colors= Colors.Clubs, Weight= Weight.Jack });
+        player.hands[0].cards.Add(new(){ Colors= Colors.Diamonds, Weight= Weight.Jack });
+        
+        Game.deck[0] = new(){ Colors= Colors.Diamonds, Weight= Weight.Ten };
+        Game.deck[1] = new(){ Colors= Colors.Diamonds, Weight= Weight.Nine };
+        // can split ??
+        Assert.True(Game.CanSplit());
+        Game.DoSplit(true);        
+        player.hands[1].cards.Add(new(){ Colors= Colors.Diamonds, Weight= Weight.Two });
+        
+        Assert.That(100, Is.EqualTo(player.bet));
+        Assert.That(100, Is.EqualTo(player.hands[0].bet));
+        Assert.That(100, Is.EqualTo(player.hands[1].bet));
+        // Assert.That(200, Is.EqualTo(player.bet));
+        Assert.That(2, Is.EqualTo(player.hands.Count()));
+        Assert.That(2, Is.EqualTo(player.hands[0].cards.Count()));
+        Assert.That(3, Is.EqualTo(player.hands[1].cards.Count()));
+
+        Assert.That(20, Is.EqualTo(player.hands[0].GetHandStrength()));
+        Assert.That(21, Is.EqualTo(player.hands[1].GetHandStrength()));
+        Assert.That(19, Is.EqualTo(dealer.hands[0].GetHandStrength()));
+
+        Game.CheckWinner();
+        // two hands won handbet * 2 total 400 back + 300 balance
+        Assert.That(700, Is.EqualTo(player.balance));
+
+    
+    }
+    [Test]
+    public void DealerBust()
+    {
+        var player = new Player("rs");
+        Game.activePlayers.Add(player);
+        var dealer = Game.activePlayers[0];
+        player.bet = 100;
+        player.hands[0].bet = 100;
+        player.balance -=100; // was 500
+        Assert.That(400, Is.EqualTo(player.balance));
+        // // Table table = new Table(Game.activePlayers);
+        player.hands[0].cards.Add(new(){ Colors= Colors.Clubs, Weight= Weight.Jack });
+        player.hands[0].cards.Add(new(){ Colors= Colors.Diamonds, Weight= Weight.Jack });
+        
+        dealer.hands[0].cards.Add(new(){ Colors= Colors.Diamonds, Weight= Weight.Ten });
+        dealer.hands[0].cards.Add(new(){ Colors= Colors.Diamonds, Weight= Weight.Ten });
+        dealer.hands[0].cards.Add(new(){ Colors= Colors.Spades, Weight= Weight.Three });
+        Assert.That(20, Is.EqualTo(player.hands[0].GetHandStrength()));
+        Assert.That(23, Is.EqualTo(dealer.hands[0].GetHandStrength()));
+
+        Game.CheckWinner();
+        Assert.That(State.ConfirmWin, Is.EqualTo(Game.state));
+        Assert.That(600, Is.EqualTo(player.balance));
+
+    }
+
 }

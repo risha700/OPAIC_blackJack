@@ -37,8 +37,10 @@ public int GetBet(){
         Utils.Render($"", x_axis:(Table.tableWidth)*55/100, y_axis:(Table.tableHeight)*85/100, renderSpace:true);                        
         int get_bet = Utils.Input($"Your bet: ", required:true);
         int safeBet = Math.Min(get_bet, (int) balance); // silent all in
-        balance -= safeBet;
+        // balance -= safeBet;
         bet += safeBet;
+        // Console.WriteLine($"DEBUG:  player hands constructor {hands[Game.activeHand].GetHandStrength()}");
+        // hands[Game.activeHand].bet = safeBet; // we have to reset it from DealRound
         Table.base_bet = safeBet;
         return safeBet;
 

@@ -1,6 +1,8 @@
 # OPAIC_blackJack
-## OPAIC BIT Programing 1 Final Submission
-
+## Otago Polytechnic - OPAIC BIT Programing 1 Final Submission
+---
+## The Motive
+    A proof of console game concept black jack (21) implemented in C# 
 ---
 Assignment As Problem: 
    
@@ -52,13 +54,18 @@ Assignment As Problem:
 
 ---
 ## Class Diagram
-![](./diagram/include.png)
+![](./BlackJack/diagram/Program.png)
 ## Activity Diagram
  ![](./diagram/activity.png)
 
+ ## Screen shots
+![](./assets/intro.png)
+![](./assets/split.png)
+![](./assets/split-final.png)
+
 ## Demo
-![](game_demo.gif)
-![](game_test.gif)
+![](assets/game_demo.gif)
+![](assets/game_test.gif)
 
 ## build
 ```
@@ -87,14 +94,29 @@ dotnet test --verbosity m
 
 ## featured
 
-    Currently our BJ game has abitlity to hit or stay , implementing double down and split next release.
+~~Currently our BJ game has abitlity to hit or stay , implementing double down and split next release.~~
 
+* needs more tests.
+* splitting doesn't abide by poker international standards " need to handle Ace split and more payout testing".
+* Refactor Game class into smaller maintainable chuncks. 
+* ## Mile Stone 
+   - Add socket functionality as a network game 
+   - Allow buying in.
+   - set user timmeout for idle game \
+    **"Feel free to fork and pr"
+---
+  
+## LICENSE    
+[ GNU GENERAL PUBLIC LICENSE ](./LICENSE)
 ### Maintainer:
 Ahmed A. <ahbox@outlook.com>
 
-Mentors: 
-    Prof. Tariq Khan <tariq.khan@op.ac.nz> \
-    Prof. Kathiravelu Ganeshan <kathiravelu.ganeshan@op.ac.nz>
+## Mentors:
+
+    Prof. Tariq Khan  
+    Prof. Kathiravelu Ganeshan     
+    Head of department: Prof. Farhad Mehdipour
+
  
 
 

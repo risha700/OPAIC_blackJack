@@ -4,12 +4,14 @@ using System.Globalization;
 namespace BlackJack;
 public class Hand {
     public  List<Card> cards = new();
+    public double bet;
+    public bool is_doubled;
     public static int strenght;
 
     public override string ToString()
     {
 
-        return "Cards in hand "+cards.Count().ToString();
+        return $"Cards in hand  {cards.Count()} bet {bet}";
     }
 
     public int TranslateCard(Card card){

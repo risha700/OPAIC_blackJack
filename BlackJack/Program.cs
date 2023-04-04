@@ -43,7 +43,6 @@ class Play{
                     // render menu for betting
                     player = Game.activePlayers[^1];
                     if (player.hands[Game.activeHand]?.cards.Count() is 0){
-                        Game.RenderGameInfo();
                         player.GetBet(); // force bet
                         Game.DealRound(); // should be called once per round
                     }
